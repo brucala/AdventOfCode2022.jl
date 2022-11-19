@@ -1,0 +1,13 @@
+name = "AdventOfCode2022"
+uuid = "3a058a7a-fb83-4486-a891-819cbe4cd3ac"
+authors = ["brucala <brucala@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+Formatting = "59287772-0a20-5a39-b81b-1366585eb4c0"
+HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
+TimeZones = "f269a46b-ccf7-5d73-abea-4c690281aa53"
