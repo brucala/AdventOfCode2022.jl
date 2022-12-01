@@ -122,9 +122,9 @@ function benchmark_table(benchmarks, html_format=false)
     common_kwargs = (crop=:none, formatters=f, body_hlines=hlines)
 
     # print in screen in text format
-    pretty_table(matrix, headers; highlighters=highlighters(false), common_kwargs...)
+    pretty_table(matrix; header=headers, highlighters=highlighters(false), common_kwargs...)
 
-    return pretty_table(String, matrix, headers; highlighters=h, common_kwargs...)
+    return pretty_table(String, matrix; header=headers, highlighters=h, common_kwargs...)
 end
 
 function highlighters(html_format=false)
