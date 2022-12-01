@@ -10,24 +10,23 @@ export solve1, solve2, parse_input
 ###
 
 function parse_input(x::AbstractString)
-    for line in splitlines(x)
+    calories = Int[]
+    for block in split(strip(x), "\n\n")
+        push!(calories, splitlines(block) .|> toint |> sum)
     end
+    return calories
 end
 
 ###
 ### Part 1
 ###
 
-function solve1(x)
-
-end
+solve1(x) = maximum(x)
 
 ###
 ### Part 2
 ###
 
-function solve2(x)
-
-end
+solve2(x) = sort(x, rev=true)[1:3] |> sum
 
 end  # module
