@@ -21,7 +21,7 @@ parse_ints(x::AbstractString) = readlines(IOBuffer(x)) .|> toint
 
 toint(s::Union{AbstractString, Char}) = parse(Int, s)
 
-splitlines(s::AbstractString) = split(strip(s), '\n')
+splitlines(s::AbstractString) = split(s, '\n')
 
 stripspaces(s::AbstractString) = replace(s, " " => "")
 
