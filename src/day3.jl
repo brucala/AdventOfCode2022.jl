@@ -9,7 +9,7 @@ export solve1, solve2, parse_input
 ### Parse
 ###
 
-parse_input(x::AbstractString) = splitlines(strip(x))
+parse_input(x::AbstractString) = splitlines(x)
 
 ###
 ### Part 1

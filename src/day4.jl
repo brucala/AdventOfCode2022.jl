@@ -21,7 +21,7 @@ function Assignment(s::AbstractString)
     Assignment(range(a...), range(b...))
 end
 
-parse_input(x::AbstractString) = Assignment.(splitlines(strip(x)))
+parse_input(x::AbstractString) = Assignment.(splitlines(x))
 
 ###
 ### Part 1

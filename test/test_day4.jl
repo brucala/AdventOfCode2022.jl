@@ -15,7 +15,7 @@ test = parse_input(
 2-8,3-7
 6-6,4-6
 2-6,4-8
-"""
+""" |> strip
 )
 
 @testset "Day$nday tests" begin

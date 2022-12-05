@@ -12,7 +12,7 @@ test = parse_input(
 A Y
 B X
 C Z
-"""
+""" |> strip
 )
 
 @testset "Day$nday tests" begin

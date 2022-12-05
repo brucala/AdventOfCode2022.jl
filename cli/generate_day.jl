@@ -51,7 +51,7 @@ data = parse_input(nday)
 
 test = parse_input(
 \"\"\"
-\"\"\"
+\"\"\" |> strip
 )
 
 @testset "Day\$nday tests" begin
