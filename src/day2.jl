@@ -10,7 +10,7 @@ export solve1, solve2, parse_input
 ###
 
 parseline(x::AbstractString) = Symbol.(split(x))
-parse_input(x::AbstractString) = parseline.(splitlines(x))
+parse_input(x::AbstractString) = parseline.(splitlines(strip(x)))
 
 ###
 ### Part 1
