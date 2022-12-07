@@ -13,13 +13,14 @@ struct File
     name::String
     size::Int
 end
-struct Dir
+mutable struct Dir
     name::String
+    size::Union{Int, Nothing}
     parent::Union{Dir, Nothing}
     dirs::Dict{String, Dir}
     files::Dict{String, File}
 end
-Dir(name::AbstractString, parent::Union{Dir, Nothing}) = Dir(name, parent, Dict(), Dict())
+Dir(name::AbstractString, parent::Union{Dir, Nothing}) = Dir(name, nothing, parent, Dict(), Dict())
 Dir() = Dir("", nothing)
 
 name(d::Dir) = d.name == "" ? "/" : d.name
@@ -40,8 +41,12 @@ function add!(d::Dir, s::AbstractString)
     return add!(d, File(name, toint(x)))
 end
 
-size(f::File) = f.size
-size(d::Dir) = sum(size.(values(d.dirs)), init=0) + sum(size.(values(d.files)), init=0)
+size(x::Union{File, Dir}) = x.size
+function size!(d::Dir)
+    isnothing(d.size) || return d.size
+    d.size = sum(size!.(values(d.dirs)), init=0) + sum(size.(values(d.files)), init=0)
+    return d.size
+end
 
 Base.show(io::IO, d::Dir) = print(io, name(d), ": ", keys(d.dirs), " ", keys((d.files)))
 
@@ -73,6 +78,8 @@ function parse_input(x::AbstractString)
     for command in commands[2:end]
         d = runcommand(d, command)
     end
+    d = root(d)
+    size!(d)
     return root(d)
 end
 
@@ -80,16 +87,16 @@ end
 ### Part 1
 ###
 
-function sizes!(d::Dir, sizes=Dict{String, Int}())
+function dirsizes!(d::Dir, sizes=Dict{String, Int}())
     sizes[path(d)] = size(d)
     for child in values(d.dirs)
-        sizes!(child, sizes)
+        dirsizes!(child, sizes)
     end
     return sizes
 end
 
 function solve1(x)
-    sizes = sizes!(x)
+    sizes = dirsizes!(x)
     sum(size for size in values(sizes) if size <= 100000)
 end
 
@@ -102,7 +109,7 @@ function solve2(x)
     required = 30000000
     unused = total - size(x)
     needed = required - unused
-    sizes = sizes!(x)
+    sizes = dirsizes!(x)
     minimum(size for size in values(sizes) if size >= needed)
 end
 
