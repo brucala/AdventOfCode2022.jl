@@ -80,16 +80,50 @@ function solve(x, floor = false)
     return -5  # didn't reach solution
 end
 
-solve1(x) = solve(deepcopy(x))
+#solve1(x) = solve(deepcopy(x))  # 32 ms
+
+function solve1(x, floor = false)
+    c = deepcopy(x)
+    ymax = maxy(c)
+    queue = [c.source]
+    while !isempty(queue)
+        x, y = pop!(queue)
+        while true
+            !floor && y > ymax && return length(c.sand)
+            if floor && y == ymax + 1
+                push!(c.sand, (x, y))
+                break
+            elseif (x, y + 1) ∉ c
+                push!(queue, (x, y))
+                y = y +1
+                continue
+            elseif (x - 1, y + 1) ∉ c
+                push!(queue, (x, y))
+                x, y = x - 1, y +1
+                continue
+            elseif (x + 1, y + 1) ∉ c
+                push!(queue, (x, y))
+                x, y = x + 1, y +1
+                continue
+            else
+                push!(c.sand, (x, y))
+                (x, y) == c.source && return length(c.sand)
+                break
+            end
+        end
+    end
+end
 
 ###
 ### Part 2
 ###
 
-function solve2(x)
-    c = deepcopy(x)
-    return solve(c, true) + 1
-end
+#function solve2(x)
+#    c = deepcopy(x)
+#    return solve(c, true) + 1
+#end
+
+solve2(x) = solve1(x, true)
 
 ###
 ### Extra
