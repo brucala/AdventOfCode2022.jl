@@ -11,14 +11,13 @@ export solve1, solve2, parse_input
 
 const Point = NTuple{2, Int}
 
-mutable struct Cave
+struct Cave
     source::Point
     horizontal::Dict{Int, Vector{UnitRange{Int}}}
     vertical::Dict{Int, Vector{UnitRange{Int}}}
     sand::Vector{Point}
-    floor::Bool
 end
-Cave(floor = false) = Cave((500, 0), Dict(), Dict(), [], floor)
+Cave() = Cave((500, 0), Dict(), Dict(), [])
 addvertical!(c::Cave, x::Int, y::UnitRange{Int}) = push!(get!(c.vertical, x, []), y)
 addhorizontal!(c::Cave, x::Int, y::UnitRange{Int}) = push!(get!(c.horizontal, x, []), y)
 
@@ -53,26 +52,30 @@ function Base.in(p::Point, c::Cave)
     x, y = p
     haskey(c.vertical, x) && any(r -> y in r, c.vertical[x]) && return true
     haskey(c.horizontal, y) && any(r -> x in r, c.horizontal[y]) && return true
-    c.floor && y == maxy(c)&& return true
     return false
 end
 
-maxy(c::Cave) = maximum(keys(c.horizontal)) + (c.floor ? 2 : 0)
+maxy(c::Cave) = maximum(keys(c.horizontal))
 
-fall!(c::Cave) = fall!(c, c.source)
-function fall!(c::Cave, p::Point)
+fall!(c::Cave, floor::Bool = false) = fall!(c, c.source, floor)
+function fall!(c::Cave, p::Point, floor::Bool)
     x, y = p
-    y > maxy(c) && return false
-    (x, y + 1) in c || return fall!(c, (x, y + 1))
-    (x - 1, y + 1) in c || return fall!(c, (x - 1, y + 1))
-    (x + 1, y + 1) in c || return fall!(c, (x + 1, y + 1))
+    !floor && y > maxy(c) && return false
+    if floor && y == maxy(c) + 1
+        push!(c.sand, p)
+        return true
+    end
+    (x, y + 1) in c || return fall!(c, (x, y + 1), floor)
+    (x - 1, y + 1) in c || return fall!(c, (x - 1, y + 1), floor)
+    (x + 1, y + 1) in c || return fall!(c, (x + 1, y + 1), floor)
+    floor && y == maxy(c) + 1 && return false
     push!(c.sand, p)
     return p != c.source
 end
 
-function solve(x)
+function solve(x, floor = false)
     for i in 0:100_000
-        fall!(x) || return i
+        fall!(x, floor) || return i
     end
     return -5  # didn't reach solution
 end
@@ -83,18 +86,9 @@ solve1(x) = solve(deepcopy(x))
 ### Part 2
 ###
 
-#maxx(c::Cave) = maximum(maximum.(map(i -> maximum.(i), values(c.horizontal))))
-#minx(c::Cave) = minimum(minimum.(map(i -> minimum.(i), values(c.horizontal))))
-#addfloor!(c::Cave) = addhorizontal!(c, maxy(c) + 2, minx(c)-10:maxx(c)+10)
-#addfloor!(c::Cave) = addhorizontal!(c, maxy(c) + 2, typemin(Int):typemax(Int))
-
 function solve2(x)
     c = deepcopy(x)
-    #addfloor!(c)
-    c.floor = true
-    return solve(c) + 1
-    solve(c)
-    return c
+    return solve(c, true) + 1
 end
 
 ###
