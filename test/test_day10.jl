@@ -30,12 +30,12 @@ expected = """
 
 @testset "Day$nday tests" begin
     @test solve1(test) == 13140
-    @test solve2(test) == expected
+    @test solve2(test) == expected_test
 end
 
 @testset "Day$nday solutions" begin
     @test solve1(data) == 11720
-    @test solve2(data) == "####.###...##..###..####.###...##....##.\n#....#..#.#..#.#..#.#....#..#.#..#....#.\n###..#..#.#....#..#.###..#..#.#.......#.\n#....###..#....###..#....###..#.......#.\n#....#.#..#..#.#.#..#....#....#..#.#..#.\n####.#..#..##..#..#.####.#.....##...##..\n"
+    @test solve2(data) == expected
 end
 
 end  # module
