@@ -26,7 +26,6 @@ end
 const N, E, S, W, = (-1, 0), (0, 1), (1, 0), (0, -1)
 const NE, NW, SE, SW = N .+ E, N .+ W, S .+ E, S .+ W
 const adjacent = (N, E, S, W, NE, NW, SE, SW)
-#const checks = Set.(([N, NE, NW], [S, SE, SW], [W, NW, SW], [E, NE, SE]))
 const checks = ((N, NE, NW), (S, SE, SW), (W, NW, SW), (E, NE, SE))
 const todir = (N, S, W, E)
 
