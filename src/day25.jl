@@ -33,21 +33,13 @@ function decimal(s::AbstractString)
 end
 
 function snafu(x::Int)
-    d, r = divrem(x, 5)
-    sol = [r]
-    while d != 0
-        d, r = divrem(d, 5)
-        push!(sol, r)
+    sol = ""
+    while x != 0
+        x, r = divrem(x, 5)
+        r > 2 && (x += 1)
+        sol *= MODMAP[r]
     end
-    d = 0
-    for i in 1:length(sol)
-        s = sol[i] + d
-        d, r = divrem(s, 5)
-        r in (3, 4) && (d += 1)
-        sol[i] = r
-    end
-    d != 0 && push!(sol, d)
-    return map(i -> MODMAP[i], reverse(sol)) |> join
+    return reverse(sol)
 end
 
 solve1(x) = snafu(sum(decimal.(x)))
