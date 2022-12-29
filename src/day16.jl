@@ -32,17 +32,6 @@ end
 ### Part 1
 ###
 
-struct Distances
-    d::Dict{Set{String}, Int}
-end
-function Base.get(d::Distances, key::String)
-    Dict(
-        first(setdiff(k, Set([key]))) => v
-        for (k, v) in d.d
-        if key in k
-    )
-end
-
 function combinations(valves)
     s = Set{Set{String}}()
     for i in 1:length(valves)-1, j in i+1:length(valves)
@@ -54,7 +43,11 @@ end
 function distances(valves, conections)
     left = setdiff(combinations(valves), conections)
     distances = Dict(1 => conections)
-    d = Distances(Dict(c => 1 for c in conections))
+    d = Dict(v => Dict{String, Int}() for v in valves)
+    for (a, b) in conections
+        d[a][b] = 1
+        d[b][a] = 1
+    end
     for i in 1:100
         isempty(left) && break
         for pair1 in distances[i], pair2 in conections
@@ -63,7 +56,9 @@ function distances(valves, conections)
             newpair = setdiff(u, pair1 ∩ pair2)
             newpair in left || continue
             push!(get!(distances, i + 1, Set()), newpair)
-            d.d[newpair] = i + 1
+            a, b = newpair
+            d[a][b] = i + 1
+            d[b][a] = i + 1
             pop!(left, newpair)
         end
     end
@@ -76,7 +71,7 @@ function pressure(p, t, pos, open, flowrate, distances, best=nothing)
     best[open] = p
     maxp = p
     for valve in setdiff(Set(keys(flowrate)), open)
-        dist = get(distances, pos)[valve]
+        dist = distances[pos][valve]
         newt = t + dist + 1
         newt > 30 && continue
         newp = p + flowrate[valve] * (30 - newt)
@@ -105,7 +100,7 @@ function pressure2(p, t1, t2, pos1, pos2, open, flowrate, distances, best=nothin
     best[open] = p
     maxp = p
     for valve in setdiff(Set(keys(flowrate)), open)
-        dist = get(distances, pos1)[valve]
+        dist = distances[pos1][valve]
         newt = t1 + dist + 1
         newt > 30 && continue
         newp = p + flowrate[valve] * (30 - newt)
