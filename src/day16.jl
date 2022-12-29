@@ -23,7 +23,6 @@ function parse_input(x::AbstractString)
     for line in splitlines(x)
         valve, rate, leadsto = parse_line(line)
         flowrate[valve] = rate
-        #foreach(c -> push!(conections, tuple(sort([valve, c])...)), leadsto)
         foreach(c -> push!(conections, Set([valve, c])), leadsto)
     end
     return flowrate, conections
@@ -63,7 +62,6 @@ function distances(valves, conections)
             length(u) != 3 && continue
             newpair = setdiff(u, pair1 ∩ pair2)
             newpair in left || continue
-            #(newpair in conections || newpair in distances[i]) && continue
             push!(get!(distances, i + 1, Set()), newpair)
             d.d[newpair] = i + 1
             pop!(left, newpair)
@@ -77,15 +75,12 @@ function pressure(p, t, pos, open, flowrate, distances, best=nothing)
     haskey(best, open) && p <= best[open] && return -1
     best[open] = p
     maxp = p
-    #t > 15 && @show t, p, pos, open, setdiff(Set(keys(flowrate)), open)
-    #t > 15 && return p
     for valve in setdiff(Set(keys(flowrate)), open)
         dist = get(distances, pos)[valve]
         newt = t + dist + 1
         newt > 30 && continue
         newp = p + flowrate[valve] * (30 - newt)
         newopen = open ∪ Set([valve])
-        #@show newt, newp, valve, newopen
         maxp = max(maxp, pressure(newp, newt, valve, newopen, flowrate, distances, best))
     end
     return maxp
@@ -96,7 +91,6 @@ function solve1(x)
     valves = sort(collect(keys(flowrate)))
     d = distances(valves, conections)
     flowrate = Dict(k => v for (k, v) in flowrate if v !=0)
-    #return d, flowrate
     p, t, pos, open = 0, 0, "AA", Set{String}()
     return pressure(p, t, pos, open, flowrate, d)
 end
@@ -110,15 +104,12 @@ function pressure2(p, t1, t2, pos1, pos2, open, flowrate, distances, best=nothin
     haskey(best, open) && p <= best[open] && return -1
     best[open] = p
     maxp = p
-    #t > 15 && @show t, p, pos, open, setdiff(Set(keys(flowrate)), open)
-    #t > 15 && return p
     for valve in setdiff(Set(keys(flowrate)), open)
         dist = get(distances, pos1)[valve]
         newt = t1 + dist + 1
         newt > 30 && continue
         newp = p + flowrate[valve] * (30 - newt)
         newopen = open ∪ Set([valve])
-        #@show newt, newp, valve, newopen
         if newt < t2
             maxp = max(maxp, pressure2(newp, newt, t2, valve, pos2, newopen, flowrate, distances, best))
         else
@@ -133,7 +124,6 @@ function solve2(x)
     valves = sort(collect(keys(flowrate)))
     d = distances(valves, conections)
     flowrate = Dict(k => v for (k, v) in flowrate if v !=0)
-    #return d, flowrate
     p, t, pos, open = 0, 4, "AA", Set{String}()
     return pressure2(p, t, t, pos, pos, open, flowrate, d)
 end
