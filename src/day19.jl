@@ -77,39 +77,41 @@ build_clay(f::Factory) = build(f, next_clay(f), [0, 1, 0, 0])
 build_obsidian(f::Factory) = build(f, next_obsidian(f), [0, 0, 1, 0])
 build_geode(f::Factory) = build(f, next_geode(f), [0, 0, 0, 1])
 
-potential_clay(f::Factory, tmax=24) = clay(f) + sum(i -> f.robots[2] + i, 1:(tmax - f.time))
+tria(n) = n * (n + 1) ÷ 2
+potential_clay(f::Factory, tmax=24) = clay(f) + f.robots[2] * (tmax - f.time)  + tria(tmax - f.time)#sum(i -> f.robots[2] + i, 1:(tmax - f.time))
 function potential_obsidian(f::Factory, tmax=24)
     n, r = obsidian(f), f.robots[3]
     Δn = potential_clay(f, tmax) ÷ f.blueprint.matrix[2,3]
     Δt = tmax - f.time
-    Δn >= Δt && return n + sum(i -> r + i, 1:Δt)
+    Δn >= Δt && return n + r * Δt + tria(Δt)
     n += (n + Δn) * (Δt - Δn)
     Δn == 0 && return n
-    return n + sum(i -> r + i, 1:Δn)
+    return n + r * Δn + tria(Δn)
 end
 function potential_geode(f::Factory, tmax=24)
     n, r = geode(f), f.robots[4]
     Δn = potential_obsidian(f, tmax) ÷ f.blueprint.matrix[3,4]
     Δt = tmax - f.time
-    Δn >= Δt && return n + sum(i -> r + i, 1:Δt)
+    Δn >= Δt && return n + r * Δt + tria(Δt)
     n += (n+Δn)*(Δt - Δn)
     Δn == 0 && return n
-    return n + sum(i -> r + i, 1:Δn)
+    return n + r * Δn + tria(Δn)
 end
 
 function maxgeodes(f::Factory; tmax=24, nmax=0)
-    #f.time > 20 && @show f
     f.time >= tmax && return 0
     potential_geode(f, tmax) < nmax && return 0
     n = geode(f) + (tmax - f.time) * f.robots[4]  # do nothing
     n = max(n, maxgeodes(build_geode(f), tmax=tmax, nmax=max(n, nmax)))
-    n = max(n, maxgeodes(build_obsidian(f), tmax=tmax, nmax=max(n, nmax)))
-    n = max(n, maxgeodes(build_clay(f), tmax=tmax, nmax=max(n, nmax)))
-    n = max(n, maxgeodes(build_ore(f), tmax=tmax, nmax=max(n, nmax)))
-    #@show f
-    #@show n, nmax
-    #@show potential_geode(f, tmax)
-    #n >= 12 && @show n, f
+    if f.robots[3] < maximum(f.blueprint.matrix[3,:])
+        n = max(n, maxgeodes(build_obsidian(f), tmax=tmax, nmax=max(n, nmax)))
+    end
+    if f.robots[2] < maximum(f.blueprint.matrix[2,:])
+        n = max(n, maxgeodes(build_clay(f), tmax=tmax, nmax=max(n, nmax)))
+    end
+    if f.robots[1] < maximum(f.blueprint.matrix[1,:])
+        n = max(n, maxgeodes(build_ore(f), tmax=tmax, nmax=max(n, nmax)))
+    end
     return n
 end
 
